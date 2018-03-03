@@ -3,6 +3,7 @@ require "gooi"
 
 myLines = {}    -- List of all lines in the game
 circles = {}    -- List of all circles in the game
+--drawingLine = {}-- Line you are currently drawing
 
 -- Add a new line to the game
 function drawLine(x1, y1, x2, y2)
@@ -83,8 +84,23 @@ function love.load()
 
 end
 
-function love.update()
+function love.update(dt)
+
     gooi.update()
+
+    for i=1, #circles do
+
+      circles[i].dy = circles[i].dy + 500*dt
+
+      for j=1, #myLines do
+        if circleOnLine(circles[i], myLines[j]) then
+          circles[i].dy = 0
+        end
+      end
+
+      circles[i].y = circles[i].y + circles[i].dy*dt
+
+    end
 
 end
 
@@ -110,7 +126,16 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button)
-	gooi.pressed()
+
+  gooi.pressed()
+
+  if drawingLine == nil then
+    drawingLine = {x = x, y = y}
+  else
+    drawLine(drawingLine.x, drawingLine.y, x, y)
+    drawingLine = nil
+  end
+
 end
 
 function love.mousereleased(x, y, button)
